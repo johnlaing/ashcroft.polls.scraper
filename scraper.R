@@ -61,12 +61,12 @@ dl <- function(max.wait=30) {
     lnk <- lnk[[length(lnk)]]
 
     ## download and wait
+    prev.f <- list.files(dl.dir, "^Welcome.*\\.zip$", full.names=TRUE)
     lnk$clickElement()
     export.btn$clickElement()
     for (i in seq(max.wait)) {
         f <- list.files(dl.dir, "^Welcome.*\\.zip$", full.names=TRUE)
-        if (length(f) == 1) return(f)
-        if (length(f) > 1) stop("multiple files match")
+        if (length(f) > length(prev.f)) return(setdiff(f, prev.f))
         Sys.sleep(1)
     }
     stop("timeout: waiting for download")
@@ -79,8 +79,5 @@ for (i in seq_along(dd.elems)) {
     cat(nm, "\n")
     select.const(dd.elems[[i]])
     f <- dl()
-
-    ## rename
-    new.nm <- file.path(dl.dir, paste0(nm, ".zip"))
-    file.rename(f, new.nm)
+    print(f)
 }
